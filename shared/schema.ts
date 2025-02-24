@@ -24,11 +24,29 @@ export const votes = pgTable("votes", {
   createdAt: timestamp("created_at").notNull().defaultNow()
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  isAdmin: true
-});
+const ADMIN_CODE = "admin123"; // In un'applicazione reale, questo dovrebbe essere in una variabile d'ambiente
+
+export const insertUserSchema = createInsertSchema(users)
+  .pick({
+    username: true,
+    password: true,
+    isAdmin: true
+  })
+  .extend({
+    adminCode: z.string().optional()
+  })
+  .refine(
+    (data) => {
+      if (data.isAdmin && (!data.adminCode || data.adminCode !== ADMIN_CODE)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Invalid admin code",
+      path: ["adminCode"]
+    }
+  );
 
 export const insertCandidateSchema = createInsertSchema(candidates).pick({
   name: true,

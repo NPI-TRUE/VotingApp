@@ -10,9 +10,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Redirect } from "wouter";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
+  const [showAdminCode, setShowAdminCode] = useState(false);
 
   const loginForm = useForm({
     defaultValues: { username: "", password: "" }
@@ -20,7 +22,7 @@ export default function AuthPage() {
 
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema),
-    defaultValues: { username: "", password: "", isAdmin: false }
+    defaultValues: { username: "", password: "", isAdmin: false, adminCode: "" }
   });
 
   if (user) {
@@ -103,10 +105,22 @@ export default function AuthPage() {
                         id="isAdmin"
                         onCheckedChange={(checked) => {
                           registerForm.setValue("isAdmin", checked === true);
+                          setShowAdminCode(checked === true);
                         }}
                       />
                       <Label htmlFor="isAdmin">Register as Administrator</Label>
                     </div>
+                    {showAdminCode && (
+                      <div>
+                        <Label htmlFor="adminCode">Admin Code</Label>
+                        <Input
+                          id="adminCode"
+                          type="password"
+                          {...registerForm.register("adminCode")}
+                          placeholder="Enter admin code"
+                        />
+                      </div>
+                    )}
                     <Button
                       type="submit"
                       className="w-full"
