@@ -91,6 +91,11 @@ export default function AuthPage() {
                         id="register-username"
                         {...registerForm.register("username")}
                       />
+                      {registerForm.formState.errors.username && (
+                        <p className="text-sm text-destructive mt-1">
+                          {registerForm.formState.errors.username.message}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="register-password">Password</Label>
@@ -99,6 +104,11 @@ export default function AuthPage() {
                         type="password"
                         {...registerForm.register("password")}
                       />
+                      {registerForm.formState.errors.password && (
+                        <p className="text-sm text-destructive mt-1">
+                          {registerForm.formState.errors.password.message}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -119,6 +129,11 @@ export default function AuthPage() {
                           {...registerForm.register("adminCode")}
                           placeholder="Enter admin code"
                         />
+                        {registerForm.formState.errors.adminCode && (
+                          <p className="text-sm text-destructive mt-1">
+                            {registerForm.formState.errors.adminCode.message}
+                          </p>
+                        )}
                       </div>
                     )}
                     <Button
