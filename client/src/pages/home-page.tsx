@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, LogOut } from "lucide-react";
+import { Loader2, LogOut, Trophy, Medal } from "lucide-react";
 import type { Candidate } from "@shared/schema";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -14,7 +14,11 @@ export default function HomePage() {
 
   const { data: candidates, isLoading } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"],
-    refetchInterval: 1000 // Poll every second for updates
+    refetchInterval: 1000, // Poll every second for updates
+    select: (data) => {
+      // Ordina i candidati per voti in ordine decrescente
+      return [...data].sort((a, b) => b.votes - a.votes);
+    }
   });
 
   const voteMutation = useMutation({
@@ -31,7 +35,7 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="container mx-auto p-8">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
               <CardHeader>
@@ -48,14 +52,27 @@ export default function HomePage() {
     );
   }
 
+  const getRankIcon = (index: number) => {
+    switch(index) {
+      case 0:
+        return <Trophy className="h-6 w-6 text-yellow-500" />;
+      case 1:
+        return <Medal className="h-6 w-6 text-gray-400" />;
+      case 2:
+        return <Medal className="h-6 w-6 text-amber-700" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Vote for Candidates</h1>
+        <h1 className="text-3xl font-bold">Classifica Candidati</h1>
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <p className="text-sm text-muted-foreground">
-            Votes remaining: {user?.votesRemaining}
+            Voti rimanenti: {user?.votesRemaining}
           </p>
           {user?.isAdmin && (
             <Button variant="outline" asChild>
@@ -80,35 +97,55 @@ export default function HomePage() {
       {candidates?.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
-            No candidates available for voting
+            Nessun candidato disponibile per il voto
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {candidates?.map((candidate) => (
-            <Card key={candidate.id}>
-              <CardHeader>
-                <CardTitle>{candidate.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  {candidate.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">
-                    Votes: {candidate.votes}
-                  </span>
-                  <Button
-                    onClick={() => voteMutation.mutate(candidate.id)}
-                    disabled={
-                      voteMutation.isPending || user?.votesRemaining === 0
-                    }
-                  >
-                    {voteMutation.isPending && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Vote
-                  </Button>
+        <div className="space-y-4">
+          {candidates?.map((candidate, index) => (
+            <Card 
+              key={candidate.id}
+              className={`transition-all ${
+                index === 0 ? 'border-yellow-500 shadow-lg' :
+                index === 1 ? 'border-gray-400' :
+                index === 2 ? 'border-amber-700' : ''
+              }`}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {getRankIcon(index)}
+                    <div>
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
+                        {candidate.name}
+                        <span className="text-sm font-normal text-muted-foreground">
+                          #{index + 1}
+                        </span>
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {candidate.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="text-right">
+                      <p className="text-2xl font-bold">
+                        {candidate.votes}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        voti
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => voteMutation.mutate(candidate.id)}
+                      disabled={voteMutation.isPending || user?.votesRemaining === 0}
+                    >
+                      {voteMutation.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Vota
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
