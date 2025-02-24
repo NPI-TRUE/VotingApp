@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 import type { Candidate } from "@shared/schema";
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, logoutMutation } = useAuth();
 
   const { data: candidates, isLoading } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"],
@@ -60,6 +60,18 @@ export default function HomePage() {
               <Link href="/admin">Admin Dashboard</Link>
             </Button>
           )}
+          <Button 
+            variant="outline" 
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutation.isPending}
+          >
+            {logoutMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="h-4 w-4 mr-2" />
+            )}
+            Logout
+          </Button>
         </div>
       </div>
 
