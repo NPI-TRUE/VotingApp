@@ -7,6 +7,7 @@ import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Loader2, LogOut } from "lucide-react";
 import type { Candidate } from "@shared/schema";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
@@ -52,6 +53,7 @@ export default function HomePage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Vote for Candidates</h1>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <p className="text-sm text-muted-foreground">
             Votes remaining: {user?.votesRemaining}
           </p>
