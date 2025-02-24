@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
@@ -96,6 +97,13 @@ export default function AuthPage() {
                         type="password"
                         {...registerForm.register("password")}
                       />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="isAdmin" 
+                        {...registerForm.register("isAdmin")}
+                      />
+                      <Label htmlFor="isAdmin">Register as Administrator</Label>
                     </div>
                     <Button
                       type="submit"
