@@ -100,8 +100,10 @@ export default function AuthPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox 
-                        id="isAdmin" 
-                        {...registerForm.register("isAdmin")}
+                        id="isAdmin"
+                        onCheckedChange={(checked) => {
+                          registerForm.setValue("isAdmin", checked === true);
+                        }}
                       />
                       <Label htmlFor="isAdmin">Register as Administrator</Label>
                     </div>
